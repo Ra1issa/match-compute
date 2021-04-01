@@ -7,7 +7,6 @@ use scuttlebutt::{AesRng, TcpChannel};
 
 use std::{
     fs::{File, write, read_to_string},
-    io::Write,
     net::{TcpStream},
     time::SystemTime,
     io::Error,
@@ -15,12 +14,11 @@ use std::{
 };
 use serde_json;
 
-fn client_protocol(mut channel: TcpChannel<TcpStream>, path:&mut PathBuf, nthreads: usize, precision: u32) -> (u128){
+fn client_protocol(mut channel: TcpChannel<TcpStream>, path:&mut PathBuf, nthreads: usize, _precision: u32) -> u128{
     let start = SystemTime::now();
     let mut rng = AesRng::new();
 
     let mut aggregates= Vec::new();
-    let mut cardinality= Vec::new();
     let mut sum_weights= Vec::new();
     for thread_id in 0..nthreads{
         let mut thread_path = "thread".to_owned();
@@ -32,32 +30,21 @@ fn client_protocol(mut channel: TcpChannel<TcpStream>, path:&mut PathBuf, nthrea
         let partial_aggregate: Vec<Wire> = serde_json::from_str(&read_to_string(path_str).unwrap()).unwrap();
         path.pop();
 
-        path.push("output_cardinality.txt");
-        let path_str = path.clone().into_os_string().into_string().unwrap();
-        let partial_cardinality: Vec<Wire> = serde_json::from_str(&read_to_string(path_str).unwrap()).unwrap();
-        path.pop();
-
         path.push("output_sum_weights.txt");
         let path_str = path.clone().into_os_string().into_string().unwrap();
         let partial_sum_weights: Vec<Wire> = serde_json::from_str(&read_to_string(path_str).unwrap()).unwrap();
         path.pop();
 
         aggregates.push(partial_aggregate);
-        cardinality.push(partial_cardinality);
         sum_weights.push(partial_sum_weights);
 
         path.pop();
     }
 
     let mut psi = Receiver::init(&mut channel, &mut rng).unwrap();
-    let weighted_mean = psi.compute_aggregates(aggregates, cardinality, sum_weights, &mut channel,&mut rng).unwrap();
-    // let aggregate: f64 = aggregate as f64/ 10_u64.pow(precision) as f64;
-    // let output: f64 = aggregate / sum_weight as f64;
-
-    // println!("Aggregate: {:?}", aggregate);
+    let weighted_mean = psi.compute_aggregates(aggregates, sum_weights, &mut channel,&mut rng).unwrap();
     println!("weighted_mean: {:?}", weighted_mean);
-    // println!("Sum of Weights: {:?}", sum_weight);
-    // println!("Weighted Mean: {:?}", output);
+
 
     path.pop();
     path.push("result.txt");
@@ -66,14 +53,8 @@ fn client_protocol(mut channel: TcpChannel<TcpStream>, path:&mut PathBuf, nthrea
 
     let _ = File::create(path_str.clone()).unwrap();
 
-    let mut output_write = "Aggregate: ".to_owned();
-    // output_write.push_str(&aggregate.to_string());
-    output_write.push_str(&"\nCardinality: ".to_owned());
+    let mut output_write = "Weighted Mean: ".to_owned();
     output_write.push_str(&weighted_mean.to_string());
-    // output_write.push_str(&"\nSum of Weights: ".to_owned());
-    // output_write.push_str(&sum_weight.to_string());
-    // output_write.push_str(&"\nWeighted Mean: ".to_owned());
-    // output_write.push_str(&output.to_string());
 
     write(path_str, output_write).expect("Unable to write file");
 

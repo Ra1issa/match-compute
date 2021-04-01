@@ -1,4 +1,8 @@
-Cargo.lock
-/target
-/.idea
-.tags*
+thread*/
+result.txt
+receiver_log.txt
+sender_log.txt
+result_nonsecure.txt
+target
+.tags
+match-compute-parallel/deltas.txt
