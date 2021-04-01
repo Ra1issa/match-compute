@@ -11,9 +11,9 @@
 
 //!
 
-mod cuckoo;
-mod errors;
-mod psi;
-mod utils;
+pub mod cuckoo;
+pub mod errors;
+pub mod psi;
+pub mod utils;
 
 pub use crate::{errors::Error, psi::*};

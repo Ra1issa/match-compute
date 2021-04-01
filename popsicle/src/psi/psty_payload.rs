@@ -577,7 +577,6 @@ impl Receiver {
             Evaluator::<C, RNG, OtReceiver>::new(channel.clone(), RNG::from_seed(rng.gen())).unwrap();
 
         let qs = &fancy_garbling::util::PRIMES[..PAYLOAD_PRIME_SIZE_EXPANDED];
-        let q = fancy_garbling::util::product(&qs);
 
         let mut acc = CrtBundle::new(aggregates[0].clone());
         let mut sum_weights = CrtBundle::new(sum_of_weights[0].clone());
