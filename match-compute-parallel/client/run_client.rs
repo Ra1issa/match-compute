@@ -70,13 +70,10 @@ pub fn main(){
     // that's assumed to be in the match-compute-parallel folder
     // and in order to create the computations files and folders
     let mut path = env::current_exe().unwrap();
+    println!("path {:?}", path);
     path.pop();
     path.pop();
     path.pop();
-    path.pop();
-
-    path.push("popsicle");
-    path.push("examples");
     path.push("match-compute-parallel");
     path.push("configuration.txt");
 
@@ -91,6 +88,7 @@ pub fn main(){
             parameters.insert(line_split[0].clone(), line_split[1].clone());
         }
     }
+    println!("hello");
     // The configuration file will have information about:
     // 1. The ip address of the server
     // 2. The duration needed for the client to sleep in order

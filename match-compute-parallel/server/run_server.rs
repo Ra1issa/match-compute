@@ -47,7 +47,7 @@ use std::{
 //
 
 pub fn main(){
-    
+
     std::panic::set_hook(Box::new(|p| {
         println!("{}", p);
         loop { }
@@ -57,10 +57,6 @@ pub fn main(){
     path.pop();
     path.pop();
     path.pop();
-    path.pop();
-
-    path.push("popsicle");
-    path.push("examples");
     path.push("match-compute-parallel");
     path.push("configuration.txt");
 
