@@ -9,8 +9,8 @@ megasize: 2
 precision: 0
 
 
-data_path_server: /Users/rissa/Desktop/NPSAS.csv
-data_path_client: /Users/rissa/Desktop/Pell.csv
+data_path_server: C:\Users\rawan\Desktop\DOED\NPSAS_small.csv
+data_path_client: C:\Users\rawan\Desktop\DOED\Pell_small.csv
 
 id_position_server: 0
 payload_position_server: 4

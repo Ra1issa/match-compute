@@ -47,8 +47,6 @@ fn client_protocol(mut channel: TcpChannel<TcpStream>, path: &mut PathBuf, nthre
     let mut rng = AesRng::new();
 
     let (ids_pad, payloads_pad) = pad_data(ids, payloads, client_padding, &mut rng);
-    println!("ids_padded {:?}", ids_pad);
-    println!("payload_padded {:?}", payloads_pad);
 
     // The Receiver bucketizes the data and seperates into megabins during the cuckoo hashing.
     // And sends the number of megabins, number of bins etc. to the sender
