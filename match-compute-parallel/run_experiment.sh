@@ -3,8 +3,6 @@ pkill -f "target/release/examples/"
 
 echo "Starting Program"
 
-cargo build --release --features="psty_payload" 
-
-cargo run --release --example run_server --features="psty_payload" > sender_log.txt &
+cargo run --release --bin parallel-server &
 sleep 1
-cargo run --release --example run_client --features="psty_payload" > receiver_log.txt &
+cargo run --release --bin parallel-client &

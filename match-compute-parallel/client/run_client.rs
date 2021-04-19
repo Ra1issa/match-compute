@@ -118,6 +118,8 @@ pub fn main(){
     let id_position = parameters.get("id_position_client").unwrap().parse::<usize>().unwrap();
     let payload_position = parameters.get("payload_position_client").unwrap().parse::<usize>().unwrap();
 
+    let client_padding = parameters.get("client_padding").unwrap().parse::<usize>().unwrap();
+
     // The ids & payloads are read from the csv according to their schema (column names),
     // and turned into the computations representation
     let (ids, payloads) = parse_files(id_position, payload_position, &client_path);
@@ -134,7 +136,7 @@ pub fn main(){
    // Bucketize the data and split into megabins that are distributed among threads
    path.pop();
    path.push("client");
-   prepare_files(&mut path, &address, nthread, megasize, &ids, &payloads);
+   prepare_files(&mut path, &address, nthread, megasize, &ids, &payloads, client_padding);
    //
     thread::sleep(duration);
 

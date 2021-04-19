@@ -4,16 +4,18 @@ sleeptime: 3
 nthread: 1
 
 itemsize: 16
-megasize: 100000
+megasize: 2
 
 precision: 0
 
 
-data_path_server: C:\Users\rawan\Desktop\DOED\NPSAS.csv
-data_path_client: C:\Users\rawan\Desktop\DOED\Pell.csv
+data_path_server: /Users/rissa/Desktop/NPSAS.csv
+data_path_client: /Users/rissa/Desktop/Pell.csv
 
 id_position_server: 0
 payload_position_server: 4
 
 id_position_client: 0
 payload_position_client: 1
+
+client_padding: 10

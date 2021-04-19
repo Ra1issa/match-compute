@@ -2,6 +2,7 @@
 use popsicle::psty_payload::{Receiver};
 
 use scuttlebutt::{AesRng, Block512, Block, TcpChannel};
+use rand::{CryptoRng, Rng};
 
 use std::{
     fs::{File, create_dir_all},
@@ -9,22 +10,50 @@ use std::{
     net::{TcpStream},
     time::SystemTime,
     path::PathBuf,
+    collections::HashMap,
 };
 
 use bincode;
 
+fn pad_data<RNG: CryptoRng + Rng>(ids: &[Vec<u8>], payloads: &[Block512], client_padding: usize, rng: &mut RNG) -> (Vec<Vec<u8>>, Vec<Block512>){
+
+    let mut real_data = HashMap::new();
+    for i in 0..ids.len(){
+        let mut id = [0 as u8; 8];
+        for j in 0..8{
+            id[j] = ids[i][j];
+        }
+        real_data.insert(u64::from_le_bytes(id), payloads[i]);
+    }
+    let mut ids_padded = ids.to_vec();
+    let mut payloads_padded = payloads.to_vec();
+
+    for _i in 0..client_padding{
+        let mut new_id = rng.gen::<u64>();
+        while real_data.contains_key(&new_id){
+            new_id = rng.gen::<u64>();
+        }
+        ids_padded.push(new_id.to_le_bytes().to_vec());
+        payloads_padded.push(Block512::from([0 as u8; 64]));
+    }
+    (ids_padded, payloads_padded)
+}
+
 
 fn client_protocol(mut channel: TcpChannel<TcpStream>, path: &mut PathBuf, nthread: usize,
-                    megasize: usize, ids: &[Vec<u8>], payloads: &[Block512]){
+                    megasize: usize, ids: &[Vec<u8>], payloads: &[Block512], client_padding: usize){
     let start = SystemTime::now();
 
     let mut rng = AesRng::new();
 
+    let (ids_pad, payloads_pad) = pad_data(ids, payloads, client_padding, &mut rng);
+    println!("ids_padded {:?}", ids_pad);
+    println!("payload_padded {:?}", payloads_pad);
 
     // The Receiver bucketizes the data and seperates into megabins during the cuckoo hashing.
     // And sends the number of megabins, number of bins etc. to the sender
     let mut psi = Receiver::init(&mut channel, &mut rng).unwrap();
-    let (table, payload, nmegabins) = psi.bucketize_data_large(&ids, &payloads, megasize, &mut channel, &mut rng).unwrap();
+    let (table, payload, nmegabins) = psi.bucketize_data_large(&ids_pad, &payloads_pad, megasize, &mut channel, &mut rng).unwrap();
 
     let megabin_per_thread = ((nmegabins as f32)/(nthread as f32)).ceil() as usize;
 
@@ -75,13 +104,13 @@ fn client_protocol(mut channel: TcpChannel<TcpStream>, path: &mut PathBuf, nthre
 }
 
 pub fn prepare_files(path: &mut PathBuf, address: &str, nthread: usize, megasize: usize,
-                    ids: &[Vec<u8>], payloads: &[Block512]){
+                    ids: &[Vec<u8>], payloads: &[Block512], client_padding: usize){
     let address = format!("{}{}", address,":3000");
 
     match TcpStream::connect(address) {
         Ok(stream) => {
             let channel = TcpChannel::new(stream);
-            client_protocol(channel, path, nthread, megasize, ids, payloads);
+            client_protocol(channel, path, nthread, megasize, ids, payloads, client_padding);
         },
         Err(e) => {
             println!("Failed to connect: {}", e);
