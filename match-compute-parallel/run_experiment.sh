@@ -1,5 +1,6 @@
 ps aux | grep "target/release/examples/"
 pkill -f "target/release/examples/"
+pkill -f "match-compute"
 
 echo "Starting Program"
 

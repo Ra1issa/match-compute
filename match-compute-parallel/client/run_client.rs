@@ -17,6 +17,7 @@ use std::{
     io::{BufRead, BufReader, stdin, stdout, Read, Write},
     collections::HashMap,
     time::{Duration},
+    time::SystemTime,
     thread,
 };
 // Alternatively uncomment this section to randomly generate the inputs.
@@ -65,12 +66,11 @@ pub fn main(){
         println!("{}", p);
         loop { }
     }));
-
+    let start = SystemTime::now();
     // Get the root directory's location in order to find the configuration file
     // that's assumed to be in the match-compute-parallel folder
     // and in order to create the computations files and folders
     let mut path = env::current_exe().unwrap();
-    println!("path {:?}", path);
     path.pop();
     path.pop();
     path.pop();
@@ -88,7 +88,6 @@ pub fn main(){
             parameters.insert(line_split[0].clone(), line_split[1].clone());
         }
     }
-    println!("hello");
     // The configuration file will have information about:
     // 1. The ip address of the server
     // 2. The duration needed for the client to sleep in order
@@ -136,7 +135,8 @@ pub fn main(){
    // Bucketize the data and split into megabins that are distributed among threads
    path.pop();
    path.push("client");
-   prepare_files(&mut path, &address, nthread, megasize, &ids, &payloads, client_padding);
+   let (read_init, written_init) = prepare_files(&mut path, &address, nthread, megasize,
+                                                &ids, &payloads, client_padding).unwrap();
    //
     thread::sleep(duration);
 
@@ -148,18 +148,43 @@ pub fn main(){
         let mut path_thread = path.clone();
         let address_thread = address.clone();
        handle.push(thread::spawn(move || {
-           client_thread(&mut path_thread, &address_thread, i);
+           client_thread(&mut path_thread, &address_thread, i).unwrap()
        }));
    }
-
+   let mut results = Vec::new();
    for thread in handle {
-        let _ = thread.join(); // maybe consider handling errors propagated from the thread here
+        results.push(thread.join().unwrap()); // maybe consider handling errors propagated from the thread here
     }
-
-
    // The partial results are joined and the output is produced
     thread::sleep(duration);
-    let _result_cardinality = join_aggregates(&mut path, &address, nthread, precision).unwrap();
+    let (_result_cardinality, read_final, written_final) = join_aggregates(&mut path, &address, nthread, precision).unwrap();
+
+    println!(
+        "TOTAL Computation time in {} s",
+        start.elapsed().unwrap().as_secs()
+    );
+
+    let mut total_read = read_final + read_init;
+    let mut total_written = written_final + written_init;
+    for (r, w) in results{
+        total_read = total_read + r;
+        total_written = total_written + w;
+    }
+
+    println!(
+        "TOTAL TIME in {} s",
+        start.elapsed().unwrap().as_secs()
+    );
+
+    println!(
+        "TOTAL READ {} Mb",
+        total_read
+    );
+
+    println!(
+        "TOTAL WRITTEN {} Mb",
+        total_written
+    );
     //
     //
     // // // test results

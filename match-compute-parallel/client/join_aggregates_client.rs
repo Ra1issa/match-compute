@@ -14,7 +14,8 @@ use std::{
 };
 use serde_json;
 
-fn client_protocol(mut channel: TcpChannel<TcpStream>, path:&mut PathBuf, nthreads: usize, _precision: u32) -> u128{
+fn client_protocol(mut channel: TcpChannel<TcpStream>, path:&mut PathBuf, nthreads: usize, _precision: u32)
+    -> (u128, f64, f64){
     let start = SystemTime::now();
     let mut rng = AesRng::new();
 
@@ -71,10 +72,13 @@ fn client_protocol(mut channel: TcpChannel<TcpStream>, path:&mut PathBuf, nthrea
         channel.kilobits_written() / 1000.0
     );
 
-    weighted_mean
+    let total_read = channel.kilobits_read() / 1000.0;
+    let total_written = channel.kilobits_written() / 1000.0;
+    (weighted_mean, total_read, total_written)
 }
 
-pub fn join_aggregates(path:&mut PathBuf, address: &str, nthreads: usize, precision: u32) -> Result<u128, Error>{
+pub fn join_aggregates(path:&mut PathBuf, address: &str, nthreads: usize, precision: u32)
+    -> Result<(u128, f64, f64), Error>{
     let port_prefix = format!("{}{}", address,":3000");
 
     match TcpStream::connect(port_prefix) {

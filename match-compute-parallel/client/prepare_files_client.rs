@@ -11,6 +11,7 @@ use std::{
     time::SystemTime,
     path::PathBuf,
     collections::HashMap,
+    io::Error,
 };
 
 use bincode;
@@ -41,14 +42,13 @@ fn pad_data<RNG: CryptoRng + Rng>(ids: &[Vec<u8>], payloads: &[Block512], client
 
 
 fn client_protocol(mut channel: TcpChannel<TcpStream>, path: &mut PathBuf, nthread: usize,
-                    megasize: usize, ids: &[Vec<u8>], payloads: &[Block512], client_padding: usize){
+                    megasize: usize, ids: &[Vec<u8>], payloads: &[Block512], client_padding: usize)
+                    ->(f64, f64){
     let start = SystemTime::now();
 
     let mut rng = AesRng::new();
 
     let (ids_pad, payloads_pad) = pad_data(ids, payloads, client_padding, &mut rng);
-    println!("ids_padded {:?}", ids_pad);
-    println!("payload_padded {:?}", payloads_pad);
 
     // The Receiver bucketizes the data and seperates into megabins during the cuckoo hashing.
     // And sends the number of megabins, number of bins etc. to the sender
@@ -101,20 +101,25 @@ fn client_protocol(mut channel: TcpChannel<TcpStream>, path: &mut PathBuf, nthre
         "Receiver :: Bucketization time (write): {:.2} Mb",
         channel.kilobits_written() / 1000.0
     );
+
+    let total_read = channel.kilobits_read() / 1000.0;
+    let total_written = channel.kilobits_written() / 1000.0;
+    (total_read, total_written)
 }
 
 pub fn prepare_files(path: &mut PathBuf, address: &str, nthread: usize, megasize: usize,
-                    ids: &[Vec<u8>], payloads: &[Block512], client_padding: usize){
+                    ids: &[Vec<u8>], payloads: &[Block512], client_padding: usize)
+                    -> Result<(f64, f64), Error>{
     let address = format!("{}{}", address,":3000");
 
     match TcpStream::connect(address) {
         Ok(stream) => {
             let channel = TcpChannel::new(stream);
-            client_protocol(channel, path, nthread, megasize, ids, payloads, client_padding);
+            Ok(client_protocol(channel, path, nthread, megasize, ids, payloads, client_padding))
         },
         Err(e) => {
             println!("Failed to connect: {}", e);
+            Err(e)
         }
     }
-    println!("Terminated.");
 }

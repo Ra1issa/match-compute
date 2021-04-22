@@ -8,12 +8,14 @@ use std::{
     net::{TcpStream},
     time::SystemTime,
     path::PathBuf,
+    io::Error,
 };
 
 use bincode;
 use serde_json;
 
-fn client_protocol(mut channel: TcpChannel<TcpStream>, path: &mut PathBuf, thread_id: usize) {
+fn client_protocol(mut channel: TcpChannel<TcpStream>, path: &mut PathBuf, thread_id: usize)
+    ->(f64, f64){
     let start = SystemTime::now();
     println!("Receiver Thread {} Starting computation", thread_id);
     let mut rng = AesRng::new();
@@ -73,20 +75,25 @@ fn client_protocol(mut channel: TcpChannel<TcpStream>, path: &mut PathBuf, threa
 
     file_aggregate.write(aggregate_json.as_bytes()).unwrap();
     file_sum_weights.write(sum_weights_json.as_bytes()).unwrap();
+
+    let total_read = channel.kilobits_read() / 1000.0;
+    let total_written = channel.kilobits_written() / 1000.0;
+    (total_read, total_written)
 }
 
-pub fn client_thread(path: &mut PathBuf, address: &str, thread_id: usize) {
+pub fn client_thread(path: &mut PathBuf, address: &str, thread_id: usize)
+    -> Result<(f64, f64), Error>{
     let port_prefix = format!("{}{}", address,":800");
     let port = format!("{}{}", port_prefix, thread_id.to_string());
 
     match TcpStream::connect(port) {
         Ok(stream) => {
             let channel = TcpChannel::new(stream);
-            client_protocol(channel, path, thread_id);
+            Ok(client_protocol(channel, path, thread_id))
         },
         Err(e) => {
             println!("Failed to connect: {}", e);
+            Err(e)
         }
     }
-    println!("Terminated.");
 }
