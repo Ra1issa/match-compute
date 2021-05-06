@@ -1,44 +1,19 @@
 // Bucketize Data and Seperate it among threads
 use popsicle::psty_payload::{Receiver, ReceiverState};
+use match_compute::util;
 
 use scuttlebutt::{AesRng, Block512, TrackChannel, SymChannel};
-use rand::{CryptoRng, Rng};
+
 use std::{
     fs::{File, create_dir_all},
     io::{Write},
     net::{TcpStream},
     time::SystemTime,
     path::PathBuf,
-    collections::HashMap,
     io::Error,
 };
 
 use bincode;
-
-fn pad_data<RNG: CryptoRng + Rng>(ids: &[Vec<u8>], payloads: &[Block512], client_padding: usize, rng: &mut RNG) -> (Vec<Vec<u8>>, Vec<Block512>){
-
-    let mut real_data = HashMap::new();
-    for i in 0..ids.len(){
-        let mut id = [0 as u8; 8];
-        for j in 0..8{
-            id[j] = ids[i][j];
-        }
-        real_data.insert(u64::from_le_bytes(id), payloads[i]);
-    }
-    let mut ids_padded = ids.to_vec();
-    let mut payloads_padded = payloads.to_vec();
-
-    for _i in 0..client_padding{
-        let mut new_id = rng.gen::<u64>();
-        while real_data.contains_key(&new_id){
-            new_id = rng.gen::<u64>();
-        }
-        ids_padded.push(new_id.to_le_bytes().to_vec());
-        payloads_padded.push(Block512::from([0 as u8; 64]));
-    }
-    (ids_padded, payloads_padded)
-}
-
 
 fn client_protocol(mut channel: TrackChannel<SymChannel<TcpStream>>, path: &mut PathBuf, nthread: usize,
                     megasize: usize, ids: &[Vec<u8>], payloads: &[Block512], client_padding: usize)
@@ -46,8 +21,7 @@ fn client_protocol(mut channel: TrackChannel<SymChannel<TcpStream>>, path: &mut 
     let start = SystemTime::now();
 
     let mut rng = AesRng::new();
-
-    let (ids_pad, payloads_pad) = pad_data(ids, payloads, client_padding, &mut rng);
+    let (ids_pad, payloads_pad) = util::pad_data(ids, payloads, client_padding, &mut rng);
 
     // The Receiver bucketizes the data and seperates into megabins during the cuckoo hashing.
     // And sends the number of megabins, number of bins etc. to the sender

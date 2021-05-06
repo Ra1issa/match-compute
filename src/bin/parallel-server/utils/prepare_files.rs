@@ -31,8 +31,8 @@ fn server_protocol(mut stream: TrackChannel<SymChannel<TcpStream>>, path: &mut P
 
     let mut rng = AesRng::new();
     let deltas = generate_deltas();
-
     path.push("delta.txt");
+
     let path_deltas = path.clone().into_os_string().into_string().unwrap();
     let mut file_deltas = File::create(path_deltas).unwrap();
     path.pop();

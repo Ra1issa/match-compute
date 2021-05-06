@@ -2,12 +2,9 @@ use popsicle::psty_payload::{Receiver, ReceiverState};
 use popsicle::psty_utils::psty_large::{
     ReceiverMegabins,
 };
-use fancy_garbling::{
-     CrtBundle,
-     Wire,
-};
 use scuttlebutt::{AesRng, TrackChannel, SymChannel};
 
+use match_compute::util;
 use std::{
     fs::{File},
     io::{Write, Read},
@@ -19,11 +16,6 @@ use std::{
 
 use bincode;
 use serde_json;
-
-fn crt_to_wires(v: &[CrtBundle<Wire>])-> Vec<Vec<Wire>>{
-    v.into_iter()
-     .map(|c| c.wires().to_vec()).collect()
-}
 
 fn client_protocol(mut channel: TrackChannel<SymChannel<TcpStream>>,
     path: &mut PathBuf, thread_id: usize, payload_size: usize)
@@ -80,8 +72,8 @@ fn client_protocol(mut channel: TrackChannel<SymChannel<TcpStream>>,
     let mut file_sum_weights = File::create(path_str).unwrap();
     path.pop();
 
-    let aggregate_json = serde_json::to_string(&crt_to_wires(&acc)).unwrap();
-    let sum_weights_json = serde_json::to_string(&crt_to_wires(&sum_weights)).unwrap();
+    let aggregate_json = serde_json::to_string(&util::crt_to_wires(&acc)).unwrap();
+    let sum_weights_json = serde_json::to_string(&util::crt_to_wires(&sum_weights)).unwrap();
 
     file_aggregate.write(aggregate_json.as_bytes()).unwrap();
     file_sum_weights.write(sum_weights_json.as_bytes()).unwrap();

@@ -1,10 +1,7 @@
 use popsicle::psty_payload::{Receiver};
+use match_compute::util;
 
-use fancy_garbling::{
-    CrtBundle,
-    Wire,
-};
-use scuttlebutt::{AesRng,SymChannel, TrackChannel};
+use scuttlebutt::{AesRng, SymChannel, TrackChannel};
 
 use std::{
     fs::{File, write, read_to_string},
@@ -15,10 +12,6 @@ use std::{
 };
 use serde_json;
 
-fn wires_to_crt(v: &[Vec<Wire>])-> Vec<CrtBundle<Wire>>{
-    v.into_iter()
-     .map(|c| CrtBundle::new(c.to_vec())).collect()
-}
 
 fn client_protocol(mut channel: TrackChannel<SymChannel<TcpStream>>,
     path:&mut PathBuf, nthreads: usize, _precision: u32, payload_size: usize)
@@ -43,8 +36,8 @@ fn client_protocol(mut channel: TrackChannel<SymChannel<TcpStream>>,
         let partial_sum_weights: Vec<Vec<Wire>> = serde_json::from_str(&read_to_string(path_str).unwrap()).unwrap();
         path.pop();
 
-        aggregates.append(&mut wires_to_crt(&partial_aggregate));
-        sum_weights.append(&mut wires_to_crt(&partial_sum_weights));
+        aggregates.append(&mut util::wires_to_crt(&partial_aggregate));
+        sum_weights.append(&mut util::wires_to_crt(&partial_sum_weights));
 
         path.pop();
     }
