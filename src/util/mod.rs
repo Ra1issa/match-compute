@@ -189,6 +189,20 @@ pub fn parse_config(path_config: &mut PathBuf) -> HashMap<String, String>{
     parameters
 }
 
+
+pub fn get_config_experiments(parameters: &HashMap<String, String>)->
+                                    (String, usize, usize, usize, u64, u64, bool){
+    let address = parameters.get("address").unwrap().to_owned();
+    let trials = parameters.get("trials").unwrap().parse::<u64>().unwrap();
+    let set_size = parameters.get("set_size").unwrap().parse::<usize>().unwrap();
+    let itemsize = parameters.get("itemsize").unwrap().parse::<usize>().unwrap();
+    let payload_size = parameters.get("payload_size").unwrap().parse::<usize>().unwrap();
+    let max_payload = parameters.get("max_payload").unwrap().parse::<u64>().unwrap();
+    let fake_data = parameters.get("fake_data").unwrap().parse::<bool>().unwrap();
+
+    (address, set_size, itemsize, payload_size, max_payload, trials, fake_data)
+}
+
 pub fn get_config_sever(parameters: &HashMap<String, String>)->
                                     (String, String, usize, usize, usize){
     let address = parameters.get("address").unwrap().to_owned();

@@ -21,8 +21,9 @@ fn server_protocol(set_size: usize, id_size: usize, max_payload: u64, payload_si
 }
 
 
-pub fn run_server(set_size: usize, id_size: usize, max_payload: u64, payload_size: usize){
-    let listener = TcpListener::bind("0.0.0.0:3000").unwrap();
+pub fn run_server(address: &str, set_size: usize, id_size: usize, max_payload: u64, payload_size: usize){
+    let address = format!("{}{}", address,":3000");
+    let listener = TcpListener::bind(address).unwrap();
     // accept connections and process them, spawning a new thread for each one
     println!("Server listening on port 3000");
     for stream in listener.incoming() {

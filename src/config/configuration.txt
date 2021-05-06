@@ -1,11 +1,15 @@
 address: 127.0.0.1
-
 sleeptime: 3
 nthread: 1
 
+trials: 20
 itemsize: 16
-megasize: 2
+payload_size: 64
+set_size: 64
+max_payload: 100
+fake_data: true
 
+megasize: 2
 precision: 0
 
 
