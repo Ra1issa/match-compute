@@ -1,12 +1,9 @@
-mod prepare_files;
-mod client_thread;
-mod join_aggregates;
 
 use crate::utils;
 
-use prepare_files::prepare_files;
-use client_thread::client_thread;
-use join_aggregates::join_aggregates;
+use crate::parallel::client_utils::prepare_files::prepare_files;
+use crate::parallel::client_utils::client_thread::client_thread;
+use crate::parallel::client_utils::join_aggregates::join_aggregates;
 
 
 use popsicle::psty_utils::util::parse_files;

@@ -1,10 +1,8 @@
-pub mod prepare_files;
-pub mod server_thread;
-pub mod join_aggregates;
+use crate::utils;
 
-use prepare_files::prepare_files;
-use server_thread::server_thread;
-use join_aggregates::join_aggregates;
+use crate::parallel::server_utils::prepare_files::prepare_files;
+use crate::parallel::server_utils::server_thread::server_thread;
+use crate::parallel::server_utils::join_aggregates::join_aggregates;
 
 use popsicle::psty_utils::{
     util::parse_files,
