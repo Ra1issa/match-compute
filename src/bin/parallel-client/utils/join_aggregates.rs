@@ -1,6 +1,6 @@
 use popsicle::psty_payload::{Receiver};
 use match_compute::util;
-
+use fancy_garbling::Wire;
 use scuttlebutt::{AesRng, SymChannel, TrackChannel};
 
 use std::{

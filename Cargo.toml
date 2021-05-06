@@ -27,8 +27,8 @@ path = "src/bin/parallel-server/main.rs"
 
 [[bin]]
 name = "simple-client"
-path = "src/bin/simple-client.rs"
+path = "src/bin/simple-client/main.rs"
 
 [[bin]]
 name = "simple-server"
-path = "src/bin/simple-server.rs"
+path = "src/bin/simple-server/main.rs"

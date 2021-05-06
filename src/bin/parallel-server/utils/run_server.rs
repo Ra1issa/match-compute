@@ -6,15 +6,7 @@ use crate::utils::{
     join_aggregates::join_aggregates,
 };
 
-use popsicle::psty_utils::{
-    util::parse_files,
-};
-
 use std::{
-    env,
-    fs::{File},
-    io::{BufRead, BufReader},
-    collections::HashMap,
     thread,
 };
 pub fn run_server(set_size: usize, id_size: usize, max_payload:u64, payload_size: usize, fake_data: bool){
@@ -24,20 +16,15 @@ pub fn run_server(set_size: usize, id_size: usize, max_payload:u64, payload_size
     let (address, server_path, nthread, id_position, payload_position) =
                                         util::get_config_sever(&parameters);
 
-    let mut ids = Vec::new();
-    let mut payloads = Vec::new();
-    if fake_data == true {
-        // The ids & payloads are generated at random
-        println!("hello server");
-        let (id, payload) = util::generate_dummy_data(set_size, id_size, max_payload);
-        ids = id;
-        payloads = payload;
-    }else{
-        // The ids & payloads are read from the csv according to their schema (column names)
-        let (id, payload) = util::parse_files(id_position, payload_position, &server_path);
-        ids = id;
-        payloads = payload;
-    }
+    let(ids, payloads) = if fake_data == true {
+            // The ids & payloads are generated at random
+            let (id, payload) = util::generate_dummy_data(set_size, id_size, max_payload);
+            util::write_server_data(&mut path, &id, &payload);
+            (id, payload)
+        }else{
+            // The ids & payloads are read from the csv according to their schema (column names)
+            util::parse_files(id_position, payload_position, &server_path)
+        };
 
    // Bucketize the data and split into megabins that are distributed among threads
     path.push("bin/parallel-server/data");

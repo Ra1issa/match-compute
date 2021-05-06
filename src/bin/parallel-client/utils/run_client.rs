@@ -9,10 +9,6 @@ use crate::utils::{
 
 
 use std::{
-    env,
-    fs::{File},
-    io::{BufRead, BufReader, stdin, stdout, Read, Write},
-    collections::HashMap,
     time::{Duration},
     time::SystemTime,
     thread,
@@ -28,19 +24,13 @@ pub fn run_client(set_size: usize, id_size: usize, max_payload:u64,
     let (address, client_path, sleeptime, precision, nthread,
         megasize, client_padding, id_position, payload_position) = util::get_config_client(&parameters);
 
-    let mut ids = Vec::new();
-    let mut payloads = Vec::new();
-    if fake_data == true {
-        // The ids & payloads are generated at random
-        let (id, payload) = util::generate_dummy_data(set_size, id_size, max_payload);
-        ids = id;
-        payloads = payload;
-    }else{
-        // The ids & payloads are read from the csv according to their schema (column names)
-        let (id, payload) = util::parse_files(id_position, payload_position, &client_path);
-        ids = id;
-        payloads = payload;
-    }
+    let (ids, payloads) = if fake_data == true {
+            // The ids & payloads are generated at random
+            util::generate_dummy_data(set_size, id_size, max_payload)
+        }else{
+            // The ids & payloads are read from the csv according to their schema (column names)
+            util::parse_files(id_position, payload_position, &client_path)
+        };
 
    // Bucketize the data and split into megabins that are distributed among threads
    path.push("bin/parallel-client/data");

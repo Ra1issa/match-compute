@@ -1,12 +1,9 @@
 use std::{
     env,
-    fs::{File, write, read_to_string},
+    fs::{File, read_to_string},
     io::{BufRead, BufReader, stdin, stdout, Read, Write},
     collections::HashMap,
     path::PathBuf,
-    time::{Duration},
-    time::SystemTime,
-    thread,
 };
 
 use rand::{CryptoRng, Rng};
@@ -14,7 +11,7 @@ use fancy_garbling::{
      CrtBundle,
      Wire,
 };
-use scuttlebutt::{AesRng, Block512, TrackChannel, SymChannel};
+use scuttlebutt::{AesRng, Block512};
 use serde_json;
 
 pub fn int_vec_block512(values: Vec<u64>) -> Vec<Block512> {
@@ -29,9 +26,7 @@ pub fn int_vec_block512(values: Vec<u64>) -> Vec<Block512> {
          }).collect()
 }
 pub fn rand_u64_vec<RNG: CryptoRng + Rng>(n: usize, modulus: u64, rng: &mut RNG) -> Vec<u64>{
-    let r = (0..n).map(|_| rng.gen::<u64>()%modulus).collect();
-    println!("r {:?}", r);
-    r
+    (0..n).map(|_| rng.gen::<u64>()%modulus).collect()
 }
 pub fn enum_ids(n: usize, id_size: usize) ->Vec<Vec<u8>>{
     let mut ids = Vec::with_capacity(n);
@@ -96,7 +91,7 @@ pub fn write_server_data(path:&mut PathBuf, ids: &[Vec<u8>], data: &[Block512]){
     path.pop();
 
     let ids_json = serde_json::to_string(ids).unwrap();
-    let res = file_ids.write(&ids_json.as_bytes()).unwrap();
+    file_ids.write(&ids_json.as_bytes()).unwrap();
 
     path.push("payloads.txt");
     let path_str = path.clone().into_os_string().into_string().unwrap();
@@ -105,6 +100,7 @@ pub fn write_server_data(path:&mut PathBuf, ids: &[Vec<u8>], data: &[Block512]){
 
     let data_json = serde_json::to_string(data).unwrap();
     file_data.write(&data_json.as_bytes()).unwrap();
+
     path.pop();
     path.push("src");
 }
