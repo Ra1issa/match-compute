@@ -1,8 +1,8 @@
-use crate::utils;
+use match_compute::utils;
 
-use crate::parallel::server_utils::prepare_files::prepare_files;
-use crate::parallel::server_utils::server_thread::server_thread;
-use crate::parallel::server_utils::join_aggregates::join_aggregates;
+use crate::server::prepare_files::prepare_files;
+use crate::server::server_thread::server_thread;
+use crate::server::join_aggregates::join_aggregates;
 
 use popsicle::psty_utils::{
     util::parse_files,

@@ -1,9 +1,10 @@
+use match_compute::util;
 
-use crate::utils;
-
-use crate::parallel::client_utils::prepare_files::prepare_files;
-use crate::parallel::client_utils::client_thread::client_thread;
-use crate::parallel::client_utils::join_aggregates::join_aggregates;
+use crate::utils::{
+    prepare_files::prepare_files,
+    client_thread::client_thread,
+    join_aggregates::join_aggregates,
+};
 
 
 use popsicle::psty_utils::util::parse_files;
@@ -75,7 +76,7 @@ pub fn main(){
     let configuration = File::open(absolute_path).unwrap();
     let buffer = BufReader::new(configuration).lines();
 
-    let mut parameters = utils::parse_config();
+    let mut parameters = util::parse_config();
     // The configuration file will have information about:
     // 1. The ip address of the server
     // 2. The duration needed for the client to sleep in order

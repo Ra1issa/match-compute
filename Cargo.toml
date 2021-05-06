@@ -19,16 +19,16 @@ rand           = "0.7.3"
 
 [[bin]]
 name = "parallel-client"
-path = "src/parallel/client.rs"
+path = "src/bin/parallel-client/main.rs"
 
 [[bin]]
 name = "parallel-server"
-path = "src/parallel/server.rs"
+path = "src/bin/parallel-server/main.rs"
 
 [[bin]]
 name = "simple-client"
-path = "src/simple/client/run_client.rs"
+path = "src/bin/simple-client.rs"
 
 [[bin]]
-name = "simple-cserver"
-path = "src/simple/server/run_server.rs"
+name = "simple-server"
+path = "src/bin/simple-server.rs"
