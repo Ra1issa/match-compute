@@ -73,5 +73,6 @@ pub fn run_client(set_size: usize, id_size: usize, max_payload:u64,
 
     // clear_results(&parameters,&mut path, &ids, &payloads, precision, fake_data);
     println!("Experiment done !");
+    thread::sleep(duration);
     (start.elapsed().unwrap().as_secs(), total_read, total_written)
 }

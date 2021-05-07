@@ -5,7 +5,7 @@ nthread: 1
 trials: 20
 itemsize: 16
 payload_size: 64
-set_size: 64
+set_size: 372
 max_payload: 100
 fake_data: true
 
