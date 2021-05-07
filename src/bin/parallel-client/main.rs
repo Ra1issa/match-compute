@@ -25,6 +25,6 @@ pub fn main(){
 
    println!("******Multi Threaded Experiment Measurments******");
    println!("Set Size {:?}, Payload Size {:?}, Item_Size {:?}", set_size, payload_size, id_size);
-   println!("Average computation time in {:?} trials is {:?} MB", trials, average_time);
+   println!("Average computation time in {:?} trials is {:?} sec", trials, average_time);
    println!("Average total communication in {:?} trials is {:?} MB", trials, average_total_com);
 }
