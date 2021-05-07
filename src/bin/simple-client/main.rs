@@ -19,6 +19,9 @@ fn main() {
         times.push(time);
         reads.push(read);
         writes.push(written);
+        println!("TOTAL TIME in {} s",time);
+        println!("TOTAL READ {} Mb",read);
+        println!("TOTAL WRITTEN {} Mb",written);
     }
 
     let average_time = times.into_iter().reduce(|a, b| a + b).unwrap()/ trials as u128;
