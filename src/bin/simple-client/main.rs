@@ -12,7 +12,7 @@ fn main() {
 
     let (time, read, written) = run_client(&address, set_size, id_size, max_payload, payload_size).unwrap();
 
-    println!("TOTAL TIME in {} s",time);
+    println!("TOTAL TIME in {} ms",time);
     println!("TOTAL READ {} Mb",read);
     println!("TOTAL WRITTEN {} Mb",written);
 
