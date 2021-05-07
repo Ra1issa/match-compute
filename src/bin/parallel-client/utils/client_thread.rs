@@ -86,7 +86,7 @@ fn client_protocol(mut channel: TrackChannel<SymChannel<TcpStream>>,
 pub fn client_thread(path: &mut PathBuf, address: &str, thread_id: usize,
                     payload_size: usize)
     -> Result<(f64, f64), Error>{
-    let port_prefix = format!("{}{}", address,":800");
+    let port_prefix = format!("{}{}", address,":300");
     let port = format!("{}{}", port_prefix, thread_id.to_string());
 
     match TcpStream::connect(port) {
