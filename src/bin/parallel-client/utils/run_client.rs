@@ -71,7 +71,7 @@ pub fn run_client(set_size: usize, id_size: usize, max_payload:u64,
     println!("TOTAL READ {} Mb",total_read);
     println!("TOTAL WRITTEN {} Mb",total_written);
 
-    clear_results(&parameters,&mut path, &ids, &payloads, precision, fake_data);
+    // clear_results(&parameters,&mut path, &ids, &payloads, precision, fake_data);
     println!("Experiment done !");
     (start.elapsed().unwrap().as_secs(), total_read, total_written)
 }

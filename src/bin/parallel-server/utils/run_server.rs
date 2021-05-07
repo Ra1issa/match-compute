@@ -18,9 +18,8 @@ pub fn run_server(set_size: usize, id_size: usize, max_payload:u64, payload_size
 
     let(ids, payloads) = if fake_data == true {
             // The ids & payloads are generated at random
-            let (id, payload) = util::generate_dummy_data(set_size, id_size, max_payload);
-            util::write_server_data(&mut path, &id, &payload);
-            (id, payload)
+            util::generate_dummy_data(set_size, id_size, max_payload)
+            // util::write_server_data(&mut path, &id, &payload);
         }else{
             // The ids & payloads are read from the csv according to their schema (column names)
             util::parse_files(id_position, payload_position, &server_path)
