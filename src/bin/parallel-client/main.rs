@@ -10,7 +10,7 @@ pub fn main(){
     let mut times = Vec::new();
     let mut reads = Vec::new();
     let mut writes = Vec::new();
-    for _i in 0..trials{
+    for i in 0..trials{
         println!("EXPERIMENT {} OUT OF {}", i+1, trials);
         let (time, read, written) = run_client(set_size, id_size, max_payload, payload_size, fake_data);
         times.push(time);
